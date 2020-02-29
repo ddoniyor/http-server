@@ -65,100 +65,59 @@ func handleConn(conn net.Conn) {
 	}
 
 	method, request, protocol := parts[0], parts[1], parts[2]
-	if method == "GET" && request == "/" && protocol == "HTTP/1.1" {
+	if method == "GET" && protocol == "HTTP/1.1" {
+		switch request {
+		case "/":
+			handleRequest(conn,"operations.html","text/html")
+			log.Printf("response on: %s", request)
+		case "/files/index.html":
+			handleRequest(conn,"files/index.html","text/html")
+			log.Printf("response on: %s", request)
+		case "/files/pngImage.png":
+			handleRequest(conn,"files/pngImage.png","image/png")
+			log.Printf("response on: %s", request)
+		case "/files/jpgImage.jpg":
+			handleRequest(conn,"files/jpgImage.jpg","image/png")
+			log.Printf("response on: %s", request)
+		case "/files/someFile.txt":
+			handleRequest(conn,"files/someFile.txt","text/html")
+			log.Printf("response on: %s", request)
+		case "/files/fizic.pdf":
+			handleRequest(conn,"files/fizic.pdf","application/pdf")
+			log.Printf("response on: %s", request)
+		}
+		}
+}
+
+func handleRequest(conn net.Conn, fileName,contentType string)  {
 		writer := bufio.NewWriter(conn)
-		bytes, err := ioutil.ReadFile("operations.html")
-		writer.WriteString("HTTP/1.1 200 Ok\r\n")
-		writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
-		writer.WriteString("Content-Type: text/html\r\n")
-		writer.WriteString("Connection: close\r\n")
-		writer.WriteString("\r\n")
-		writer.Write(bytes)
+		bytes, err := ioutil.ReadFile(fileName)
+		_, err= writer.WriteString("HTTP/1.1 200 OK\r\n")
+		if err != nil {
+			log.Printf("cant  write serv:%v",err)
+		}
+		_, err = writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
+		if err != nil {
+			log.Printf("cant write content: %v",err)
+		}
+		_, err = writer.WriteString("Content-Type:" +contentType+"\r\n")
+		if err != nil {
+			log.Printf("cant write type: %v",err)
+		}
+		_, err = writer.WriteString("Connection: Close\r\n")
+		if err != nil {
+			log.Printf("cant write conn:%v",err)
+		}
+		_, err = writer.WriteString("\r\n")
+		if err != nil {
+			log.Printf("cant write: %v",err)
+		}
+		_, err = writer.Write(bytes)
+		if err != nil {
+			log.Printf("cant write :%v",err)
+		}
 		err = writer.Flush()
 		if err != nil {
 			log.Printf("can't sent response: %v", err)
 		}
-		log.Printf("response on: %s", request)
-
-	}
-
-	if method == "GET" && request == "/files/index.html" && protocol == "HTTP/1.1" {
-		writer := bufio.NewWriter(conn)
-		bytes, err := ioutil.ReadFile("files/index.html")
-		_, _ = writer.WriteString("HTTP/1.1 200 OK\r\n")
-		_, _ = writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
-		_, _ = writer.WriteString("Content-Type: text/html\r\n")
-		_, _ = writer.WriteString("Connection: Close\r\n")
-		_, _ = writer.WriteString("\r\n")
-		_, _ = writer.Write(bytes)
-		err = writer.Flush()
-		if err != nil {
-			log.Printf("can't sent response: %v", err)
-		}
-		log.Printf("response on: %s", request)
-	}
-
-	if method == "GET" && request == "/files/pngImage.png" && protocol == "HTTP/1.1" {
-		writer := bufio.NewWriter(conn)
-		bytes, err := ioutil.ReadFile("files/pngImage.png")
-		_, _ = writer.WriteString("HTTP/1.1 200 OK\r\n")
-		_, _ = writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
-		_, _ = writer.WriteString("Content-Type: image/png\r\n")
-		_, _ = writer.WriteString("Connection: Close\r\n")
-		_, _ = writer.WriteString("\r\n")
-		_, _ = writer.Write(bytes)
-		err = writer.Flush()
-		if err != nil {
-			log.Printf("can't sent response: %v", err)
-		}
-		log.Printf("response on: %s", request)
-	}
-
-	if method == "GET" && request == "/files/jpgImage.jpg" && protocol == "HTTP/1.1" {
-		writer := bufio.NewWriter(conn)
-		bytes, err := ioutil.ReadFile("files/jpgImage.jpg")
-		_, _ = writer.WriteString("HTTP/1.1 200 OK\r\n")
-		_, _ = writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
-		_, _ = writer.WriteString("Content-Type: image/png\r\n")
-		_, _ = writer.WriteString("Connection: Close\r\n")
-		_, _ = writer.WriteString("\r\n")
-		_, _ = writer.Write(bytes)
-		err = writer.Flush()
-		if err != nil {
-			log.Printf("can't sent response: %v", err)
-		}
-		log.Printf("response on: %s", request)
-	}
-
-	if method == "GET" && request == "/files/someFile.txt" && protocol == "HTTP/1.1" {
-		writer := bufio.NewWriter(conn)
-		bytes, err := ioutil.ReadFile("files/someFile.txt")
-		_, _ = writer.WriteString("HTTP/1.1 200 OK\r\n")
-		_, _ = writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
-		_, _ = writer.WriteString("Content-Type: text/html\r\n")
-		_, _ = writer.WriteString("Connection: Close\r\n")
-		_, _ = writer.WriteString("\r\n")
-		_, _ = writer.Write(bytes)
-		err = writer.Flush()
-		if err != nil {
-			log.Printf("can't sent response: %v", err)
-		}
-		log.Printf("response on: %s", request)
-	}
-
-	if method == "GET" && request == "/files/fizic.pdf" && protocol == "HTTP/1.1" {
-		writer := bufio.NewWriter(conn)
-		bytes, err := ioutil.ReadFile("files/fizic.pdf")
-		_, _ = writer.WriteString("HTTP/1.1 200 OK\r\n")
-		_, _ = writer.WriteString(fmt.Sprintf("Content-Length: %d\r\n", len(bytes)))
-		_, _ = writer.WriteString("Content-Type: application/pdf\r\n")
-		_, _ = writer.WriteString("Connection: Close\r\n")
-		_, _ = writer.WriteString("\r\n")
-		_, _ = writer.Write(bytes)
-		err = writer.Flush()
-		if err != nil {
-			log.Printf("can't sent response: %v", err)
-		}
-		log.Printf("response on: %s", request)
-	}
 }

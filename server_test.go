@@ -33,7 +33,7 @@ func Test_forServer(t *testing.T) {
 		t.Fatalf("can't read answer from server: %v", err)
 	}
 	response := string(byte)
-	if !strings.Contains(response, "HTTP/1.1 200 Ok") {
+	if !strings.Contains(response, "HTTP/1.1 200 OK") {
 		t.Fatalf("without answer: %s", response)
 	}
 }
